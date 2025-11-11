@@ -9,7 +9,13 @@ declare global {
 // If DATABASE_URL is not set (e.g. quick dev-style deploy on Vercel),
 // fall back to a local sqlite file. This makes the app usable immediately
 // after deploy for testing, but note the file system on Vercel is ephemeral.
-const fallbackSqliteUrl = process.env.DATABASE_URL ?? "file:./dev.sqlite";
+// Use /tmp on production (Vercel) so the path is absolute and works regardless
+// of the working directory at runtime. On local dev, use ./dev.sqlite.
+const fallbackSqliteUrl =
+  process.env.DATABASE_URL ??
+  (process.env.NODE_ENV === "production"
+    ? "file:/tmp/dev.sqlite"
+    : "file:./dev.sqlite");
 
 export const prisma =
   global.prisma ||
