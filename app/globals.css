@@ -1,0 +1,457 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Google font import */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+
+:root{
+  --bg1: #071028; /* deep navy */
+  --bg2: #071b2b; /* teal navy */
+  --accent: #f59e0b; /* amber */
+  --muted: #9aa4af;
+  --header-h: 72px;
+}
+
+/* page background gradient */
+html,body,#__next {
+  height:100%;
+  overflow: hidden;
+  background: radial-gradient(1200px 600px at 10% 10%, rgba(245,158,11,0.04), transparent 8%),
+              linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
+  font-family: 'Montserrat', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  color: #E6EEF6;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  margin:0;
+}
+
+/* NAVBAR */
+header {
+  height: var(--header-h);
+  min-height: var(--header-h);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding: 0 28px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  border-bottom: 1px solid rgba(255,255,255,0.02);
+}
+
+/* brand */
+.logo-badge{
+  width:46px;height:46px;border-radius:10px;
+  background: linear-gradient(135deg,var(--accent),#ffcc66);
+  display:flex;align-items:center;justify-content:center;color:#081018;font-weight:800;font-size:18px;
+  box-shadow: 0 6px 18px rgba(11,18,32,0.6);
+}
+
+/* nav links */
+.nav-links {
+  display:flex;
+  gap: 14px;
+  align-items:center;
+}
+
+/* login link (subtle) */
+.nav-link {
+  color: rgba(230,238,246,0.85);
+  text-decoration: none;
+  font-weight: 600;
+  padding: 6px 8px;
+  border-radius: 8px;
+  transition: all .14s ease;
+  opacity: 0.9;
+}
+.nav-link:hover {
+  transform: translateY(-2px);
+  color: white;
+  background: rgba(255,255,255,0.02);
+  box-shadow: 0 6px 18px rgba(2,6,23,0.5);
+}
+
+/* primary CTA (Get started) */
+.nav-cta {
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: linear-gradient(90deg,var(--accent), #ffcc66);
+  color: #081018;
+  font-weight: 800;
+  box-shadow: 0 10px 30px rgba(245,158,11,0.12);
+  text-decoration: none;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.nav-cta:hover { transform: translateY(-3px); box-shadow: 0 14px 36px rgba(245,158,11,0.18); }
+
+/* centered container used on auth pages */
+.auth-shell{
+  /* make it center inside remaining viewport after header */
+  min-height: calc(100vh - var(--header-h));
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 1rem 1rem;
+  margin-top: 100px;
+}
+
+/* card */
+.auth-card{
+  width: 100%;
+  max-width: 1100px;
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: 2rem;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border-radius: 16px;
+  padding: 2.25rem;
+  box-shadow: 0 18px 50px rgba(2,6,23,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.03);
+  overflow: hidden;
+  transform: translateY(-6px); /* subtle lift */
+}
+
+/* left marketing panel */
+.auth-left{
+  padding: 1rem 1.5rem;
+  display:flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.25rem;
+}
+.h-title{
+  font-size: clamp(28px, 2.8vw, 36px);
+  font-weight:800;
+  color: #F8FAFC;
+  line-height:1.02;
+}
+.h-sub{
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* right form panel */
+.auth-right{
+  padding: 1rem 1.5rem;
+  display:flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* form controls */
+.input {
+  width:100%;
+  padding: .75rem .9rem;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.035);
+  color: #e6eef6;
+  outline: none;
+  transition: all .15s ease;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.01);
+}
+.input::placeholder { color: rgba(230,238,246,0.35); }
+.input:focus {
+  transform: translateY(-1px);
+  border-color: rgba(245,158,11,0.9);
+  box-shadow: 0 8px 30px rgba(245,158,11,0.06);
+}
+
+/* primary button */
+.btn {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.5rem;
+  padding:.9rem 1rem;
+  border-radius: 12px;
+  background: linear-gradient(90deg,var(--accent),#ffcc66);
+  color: #06121a;
+  font-weight:800;
+  cursor:pointer;
+  border:none;
+  transition: transform .12s ease, box-shadow .12s ease, opacity .12s;
+  width:100%;
+  box-shadow: 0 10px 36px rgba(245,158,11,0.12);
+}
+.btn:disabled { opacity: .6; cursor:not-allowed; }
+.btn:hover { transform: translateY(-3px); box-shadow: 0 14px 36px rgba(245,158,11,0.18); }
+
+/* subtle link */
+.muted-link { color: var(--muted); font-size: .95rem; }
+.small { font-size:.9rem; color:var(--muted); }
+
+/* responsive */
+@media (max-width: 920px) {
+  .auth-card { grid-template-columns: 1fr; padding:1.1rem; transform: translateY(0); }
+  .auth-left { order:2; text-align:center; }
+  .auth-right { order:1; }
+}
+
+/* ---------- Password eye & inline form-row fixes (appended) ---------- */
+
+/* wrapper to position the eye button inside the input without changing layout */
+.input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* eye button centered vertically inside the input */
+.eye-button {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  padding: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #F6C36A;
+  border-radius: 8px;
+  transition: box-shadow .12s, transform .08s;
+}
+.eye-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(246,195,106,0.12);
+  transform: translateY(-50%) scale(1.02);
+}
+
+/* row that contains remember + forgot aligned */
+.form-row {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 12px;
+  margin-top: 8px;
+}
+.form-row .remember {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color: var(--muted);
+}
+.forgot-link {
+  color: var(--muted);
+  text-decoration: underline;
+  font-size: 0.95rem;
+}
+/* Dashboard Styling */
+.dashboard-shell {
+  min-height: calc(100vh - var(--header-h));
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 0 1rem;
+  margin-top: -50px;
+}
+
+.dashboard-inner {
+  width: 100%;
+  max-width: 1100px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.dash-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #f9fafb;
+  margin-bottom: 0.3rem;
+}
+
+.dash-sub {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.dash-time {
+  font-size: 0.95rem;
+  color: #d1d5db;
+}
+
+.dash-card {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 18px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  padding: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  transition: all 0.2s ease;
+}
+
+.dash-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.5);
+}
+
+.dash-content {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+.chart-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.chart-controls {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.chart-form {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.chart-input {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 0.55rem 0.9rem;
+  border-radius: 10px;
+  color: #f8fafc;
+  font-size: 0.9rem;
+  width: 90px;
+  outline: none;
+  transition: border 0.2s ease;
+}
+.chart-input:focus {
+  border-color: var(--accent);
+}
+
+.chart-refresh {
+  padding: 0.55rem 1rem;
+  border-radius: 10px;
+  background: linear-gradient(90deg, var(--accent), #ffcc66);
+  border: none;
+  color: #081018;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.2);
+}
+.chart-refresh:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(245, 158, 11, 0.25);
+}
+
+.chart-note {
+  font-size: 0.9rem;
+  color: #9aa4af;
+}
+
+.price-diff-up {
+  color: #4ade80;
+  font-weight: 700;
+}
+.price-diff-down {
+  color: #f87171;
+  font-weight: 700;
+}
+.price-value {
+  font-size: 2.3rem;
+  font-weight: 800;
+  color: #f9fafb;
+}
+/* ---------- Navbar user chip + logout button polish ---------- */
+
+/* compact user chip that contains an avatar and the email (truncated) */
+.user-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.03);
+  padding: 6px 10px;
+  border-radius: 12px;
+  color: rgba(230,238,246,0.95);
+  font-weight: 600;
+  margin-left: 6px;
+  min-width: 140px;
+  justify-content: center;
+  box-shadow: 0 6px 16px rgba(2,6,23,0.45);
+}
+
+/* small avatar circle on the left of the chip */
+.user-avatar {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: linear-gradient(135deg,var(--accent), #ffcc66);
+  color: #081018;
+  font-weight: 800;
+  box-shadow: 0 4px 14px rgba(11,18,32,0.45);
+  font-size: 14px;
+}
+
+/* truncate long emails visually while keeping title for full email */
+.user-email {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
+  display: inline-block;
+  vertical-align: middle;
+  font-size: 0.95rem;
+  text-align: left;
+  color: rgba(230,238,246,0.95);
+}
+
+/* logout button styled to match CTA but compact */
+.nav-logout {
+  margin-left: 8px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(90deg, var(--accent), #ffcc66);
+  color: #081018;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 8px 28px rgba(245,158,11,0.12);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.nav-logout:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 36px rgba(245,158,11,0.18);
+}
+
+/* make sure the nav links area remains compact on smaller screens */
+@media (max-width: 880px) {
+  .nav-links { gap: 8px; }
+  .user-chip { min-width: 110px; padding: 6px 8px; }
+  .user-email { max-width: 90px; font-size: 0.85rem; }
+  .nav-logout { padding: 6px 10px; font-size: 0.92rem; }
+}
+
+/* subtle hover for nav-link to match elevated feel */
+.nav-link:hover {
+  background: rgba(255,255,255,0.015);
+  box-shadow: 0 6px 16px rgba(2,6,23,0.45);
+  transform: translateY(-2px);
+}

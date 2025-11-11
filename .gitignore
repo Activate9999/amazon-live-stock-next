@@ -1,0 +1,16 @@
+node_modules/
+.next/
+out/
+.env
+.env.local
+.env.*.local
+*.swp
+*.swo
+*~
+.DS_Store
+.vercel
+.turbo
+dist/
+build/
+*.pem
+prisma/*.db*
