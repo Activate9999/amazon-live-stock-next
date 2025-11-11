@@ -5,6 +5,10 @@ type YahooChartResponse = any;
 const YAHOO_BASE = "https://query1.finance.yahoo.com/v8/finance/chart";
 const DEFAULT_SYMBOL = "AMZN";
 
+// This route reads request.url to parse query parameters, so it must run
+// server-side. Prevent Next from attempting static rendering.
+export const dynamic = 'force-dynamic';
+
 /**
  * helper: convert Yahoo's timestamps+quote arrays into points array
  * Yahoo `timestamp` array are seconds (UNIX epoch in seconds).
