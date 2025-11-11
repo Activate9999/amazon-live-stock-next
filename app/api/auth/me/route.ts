@@ -3,6 +3,10 @@ import { NextResponse } from "next/server";
 import { verifyToken } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
+// This route depends on request headers (cookies) so it must run as a
+// dynamic server route. Prevent Next from trying to render it statically.
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: Request) {
   try {
     const cookieName = process.env.AUTH_COOKIE_NAME || "alst_auth";
