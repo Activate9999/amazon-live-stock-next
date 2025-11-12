@@ -6,27 +6,24 @@ declare global {
   var prisma: PrismaClient | undefined;
 }
 
-// If DATABASE_URL is not set (e.g. quick dev-style deploy on Vercel),
-// fall back to a local sqlite file. This makes the app usable immediately
-// after deploy for testing, but note the file system on Vercel is ephemeral.
-// Use /tmp on production (Vercel) so the path is absolute and works regardless
-// of the working directory at runtime. On local dev, use ./dev.sqlite.
-const fallbackSqliteUrl =
-  process.env.DATABASE_URL ??
-  (process.env.NODE_ENV === "production"
-    ? "file:/tmp/dev.sqlite"
-    : "file:./dev.sqlite");
+// Ensure DATABASE_URL is set before Prisma schema validation runs.
+// If DATABASE_URL is not provided (e.g. in Vercel without env vars set),
+// fall back to a local SQLite file for quick testing. On local dev, use ./dev.sqlite.
+// On production (Vercel), use /tmp/dev.sqlite (absolute path, ephemeral but works).
+if (!process.env.DATABASE_URL) {
+  if (process.env.NODE_ENV === "production") {
+    process.env.DATABASE_URL = "file:/tmp/dev.sqlite";
+  } else {
+    process.env.DATABASE_URL = "file:./dev.sqlite";
+  }
+  // eslint-disable-next-line no-console
+  console.warn("⚠️  DATABASE_URL not set; using fallback SQLite:", process.env.DATABASE_URL);
+}
 
 export const prisma =
   global.prisma ||
   new PrismaClient({
     log: ["query"],
-    // Allow overriding the datasource at runtime when DATABASE_URL isn't provided
-    datasources: {
-      db: {
-        url: fallbackSqliteUrl,
-      },
-    },
   });
 
 if (process.env.NODE_ENV !== "production") global.prisma = prisma;
