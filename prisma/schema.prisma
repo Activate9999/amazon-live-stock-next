@@ -3,7 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  // Switched to PostgreSQL for production. DATABASE_URL should point to a
+  // Postgres database (e.g. Supabase, Vercel Postgres).
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
