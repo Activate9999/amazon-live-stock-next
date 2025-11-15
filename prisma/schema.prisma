@@ -6,13 +6,103 @@ datasource db {
   // Switched to PostgreSQL for production. DATABASE_URL should point to a
   // Postgres database (e.g. Supabase, Vercel Postgres).
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
-  id        Int     @id @default(autoincrement())
-  email     String  @unique
-  name      String?
-  password  String
+  id            Int            @id @default(autoincrement())
+  email         String         @unique
+  name          String?
+  password      String
+  createdAt     DateTime       @default(now())
+  cashBalance   Float          @default(10000.0)
+  watchlists    Watchlist[]
+  alerts        Alert[]
+  portfolios    Portfolio[]
+  trades        Trade[]
+  notifications Notification[]
+  settings      UserSettings?
+}
+
+model Watchlist {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  ticker    String
+  addedAt   DateTime @default(now())
+  sortOrder Int      @default(0)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, ticker])
+  @@index([userId])
+}
+
+model Alert {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  ticker      String
+  condition   String    // "above" | "below"
+  targetPrice Float
+  isActive    Boolean   @default(true)
+  triggered   Boolean   @default(false)
+  triggeredAt DateTime?
+  createdAt   DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isActive])
+}
+
+model Portfolio {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  ticker        String
+  quantity      Float
+  avgBuyPrice   Float
+  currentPrice  Float?
+  lastUpdated   DateTime @default(now())
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, ticker])
+  @@index([userId])
+}
+
+model Trade {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  ticker      String
+  type        String   // "buy" | "sell"
+  quantity    Float
+  price       Float
+  total       Float
+  fee         Float    @default(0)
+  executedAt  DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, executedAt])
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  title     String
+  message   String
+  type      String   // "alert" | "trade" | "news" | "system"
+  isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead, createdAt])
+}
+
+model UserSettings {
+  id                    Int     @id @default(autoincrement())
+  userId                Int     @unique
+  theme                 String  @default("dark") // "dark" | "light"
+  timezone              String  @default("UTC")
+  defaultInterval       String  @default("1d")
+  emailNotifications    Boolean @default(true)
+  pushNotifications     Boolean @default(false)
+  autoRefresh           Boolean @default(true)
+  refreshInterval       Int     @default(60) // seconds
+  user                  User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
