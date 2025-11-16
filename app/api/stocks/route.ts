@@ -103,7 +103,7 @@ export async function GET(request: Request) {
       interval = "1wk"; // weekly candles for very long ranges
     }
 
-    const yahooUrl = `${YAHOO_BASE}/${encodeURIComponent(symbol)}?interval=${interval}&range=${range}&includePrePost=true`;
+    const yahooUrl = `${YAHOO_BASE}/${encodeURIComponent(symbol)}?interval=${interval}&range=${range}`;
 
     // Use a common browser UA. Yahoo sometimes blocks/no-ops for missing UA.
     const headers = {
@@ -112,8 +112,7 @@ export async function GET(request: Request) {
       Accept: "application/json, text/javascript, */*; q=0.01",
     };
 
-    // no-store to reduce stale caching and get near-live
-    const res = await fetch(yahooUrl, { headers, cache: "no-store" });
+    const res = await fetch(yahooUrl, { headers });
 
     if (!res.ok) {
       return NextResponse.json(

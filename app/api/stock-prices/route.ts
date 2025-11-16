@@ -16,7 +16,7 @@ export async function POST(request: Request) {
       tickers.map(async (ticker: string) => {
         try {
           const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`;
-          const res = await fetch(url, { cache: "no-store" });
+          const res = await fetch(url);
           const data = await res.json();
           
           const result = data.chart?.result?.[0];

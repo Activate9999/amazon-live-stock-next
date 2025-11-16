@@ -111,9 +111,30 @@ export default function DashboardPage() {
   async function fetchStock(t: string, range: IntervalType) {
     setLoading(true);
     try {
-      const res = await fetch(`/api/stocks?ticker=${encodeURIComponent(t)}&range=${range}`);
-      if (!res.ok) return;
-      const json = await res.json();
+      // Use the same shared price cache API for consistency
+      const res = await fetch("/api/stock-prices", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tickers: [t] }),
+      });
+      
+      if (res.ok) {
+        const priceData = await res.json();
+        const stockPrice = priceData.prices?.[0];
+        
+        if (stockPrice && stockPrice.price) {
+          // Update price cache
+          setPriceCache(prev => ({
+            ...prev,
+            [t]: stockPrice,
+          }));
+        }
+      }
+      
+      // Fetch chart data separately
+      const chartRes = await fetch(`/api/stocks?ticker=${encodeURIComponent(t)}&range=${range}`);
+      if (!chartRes.ok) return;
+      const json = await chartRes.json();
       setData(json);
       setLastUpdated(new Date());
     } catch (err) {
