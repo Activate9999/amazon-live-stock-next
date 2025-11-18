@@ -24,6 +24,8 @@ function buildPoints(result: YahooChartResponse["chart"]["result"][0]) {
   const closes = quote.close || [];
   const volumes = quote.volume || [];
 
+  console.log(`[buildPoints] Total timestamps from Yahoo: ${tsArr.length}`);
+
   const pts: Array<Record<string, any>> = [];
   for (let i = 0; i < tsArr.length; i++) {
     const tsSec = tsArr[i];
@@ -46,6 +48,7 @@ function buildPoints(result: YahooChartResponse["chart"]["result"][0]) {
     });
   }
 
+  console.log(`[buildPoints] Valid points after filtering: ${pts.length}`);
   return pts;
 }
 
@@ -96,36 +99,60 @@ export async function GET(request: Request) {
     const range = url.searchParams.get("range") || "1d"; // default to 1d
     
     // Map range to appropriate interval
-    let interval = "1m"; // default
-    if (["5d", "1mo", "3mo", "6mo"].includes(range)) {
-      interval = "1d"; // daily candles for longer ranges
+    let interval = "1m"; // default - 1 minute for intraday
+    if (range === "5d") {
+      interval = "5m"; // 5-minute candles for 5 days
+    } else if (["1mo", "3mo"].includes(range)) {
+      interval = "1h"; // hourly candles for 1-3 months
+    } else if (range === "6mo") {
+      interval = "1d"; // daily candles for 6 months
     } else if (["1y", "5y", "max"].includes(range)) {
       interval = "1wk"; // weekly candles for very long ranges
     }
+    // For 1d and 1M ranges, keep 1m interval for full minute data
 
-    const yahooUrl = `${YAHOO_BASE}/${encodeURIComponent(symbol)}?interval=${interval}&range=${range}`;
+    const yahooUrl = `${YAHOO_BASE}/${encodeURIComponent(symbol)}?interval=${interval}&range=${range}&includePrePost=true`;
 
     // Use a common browser UA. Yahoo sometimes blocks/no-ops for missing UA.
     const headers = {
       "User-Agent":
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36",
-      Accept: "application/json, text/javascript, */*; q=0.01",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      "Accept": "application/json",
+      "Accept-Language": "en-US,en;q=0.9",
+      "Cache-Control": "no-cache",
+      "Pragma": "no-cache",
     };
 
-    const res = await fetch(yahooUrl, { headers });
+    console.log(`[stocks] Fetching ${symbol} from Yahoo Finance: ${yahooUrl}`);
+
+    const res = await fetch(yahooUrl, { 
+      headers,
+      cache: 'no-store',
+    });
+
+    console.log(`[stocks] Yahoo API response status: ${res.status}`);
 
     if (!res.ok) {
+      const errorText = await res.text();
+      console.error(`[stocks] Yahoo API error: ${res.status} - ${errorText}`);
       return NextResponse.json(
-        { error: `Yahoo API returned ${res.status}`, fromCache: false },
+        { error: `Yahoo API returned ${res.status}: ${errorText}`, fromCache: false },
         { status: 502 }
       );
     }
 
     const json: YahooChartResponse = await res.json();
+    console.log(`[stocks] Yahoo API response:`, JSON.stringify(json).substring(0, 200));
+    
     const result = json?.chart?.result?.[0];
 
     if (!result) {
-      return NextResponse.json({ error: "No result from Yahoo", fromCache: false }, { status: 502 });
+      console.error(`[stocks] No result from Yahoo for ${symbol}:`, json);
+      return NextResponse.json({ 
+        error: "No result from Yahoo", 
+        details: json?.chart?.error?.description || "Unknown error",
+        fromCache: false 
+      }, { status: 502 });
     }
 
     const points = buildPoints(result);
@@ -173,7 +200,7 @@ export async function GET(request: Request) {
       pct: pct != null ? Number(Number(pct).toFixed(4)) : null,
       high: high != null ? Number(Number(high).toFixed(4)) : null,
       low: low != null ? Number(Number(low).toFixed(4)) : null,
-  volume: volumeOut != null ? Number(volumeOut) : null,
+      volume: volumeOut != null ? Number(volumeOut) : null,
       timestamp: timestampIso,
       fromCache: false,
       _meta: {
@@ -190,6 +217,7 @@ export async function GET(request: Request) {
       points, // include points for frontend charting (time in ms)
     };
 
+    console.log(`[stocks] Successfully fetched ${symbol}: price=${price}, points=${points.length}`);
     return NextResponse.json(out, { status: 200 });
   } catch (err: any) {
     console.error("stocks route error:", err);

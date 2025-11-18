@@ -16,23 +16,48 @@ export async function POST(request: Request) {
       tickers.map(async (ticker: string) => {
         try {
           const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`;
-          const res = await fetch(url);
+          console.log(`[stock-prices] Fetching ${ticker} from ${url}`);
+          
+          const res = await fetch(url, {
+            headers: {
+              "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+              "Accept": "application/json",
+              "Accept-Language": "en-US,en;q=0.9",
+            },
+            cache: 'no-store',
+          });
+          
+          console.log(`[stock-prices] ${ticker} response status: ${res.status}`);
+          
+          if (!res.ok) {
+            console.error(`[stock-prices] Error fetching ${ticker}: ${res.status}`);
+            return { ticker, price: null, change: null, changePct: null };
+          }
+          
           const data = await res.json();
           
           const result = data.chart?.result?.[0];
           const meta = result?.meta;
           const quote = result?.indicators?.quote?.[0];
           
-          if (!meta || !quote) return { ticker, price: null, change: null, changePct: null };
+          if (!meta || !quote) {
+            console.error(`[stock-prices] Invalid data structure for ${ticker}`);
+            return { ticker, price: null, change: null, changePct: null };
+          }
 
           const close = quote.close?.[quote.close.length - 1];
           const previousClose = meta.previousClose || meta.chartPreviousClose;
           
-          if (!close || !previousClose) return { ticker, price: null, change: null, changePct: null };
+          if (!close || !previousClose) {
+            console.error(`[stock-prices] Missing price data for ${ticker}: close=${close}, previousClose=${previousClose}`);
+            return { ticker, price: null, change: null, changePct: null };
+          }
 
           const change = close - previousClose;
           const changePct = (change / previousClose) * 100;
 
+          console.log(`[stock-prices] Successfully fetched ${ticker}: price=${close}, change=${change}`);
+          
           return {
             ticker,
             name: meta.longName || meta.shortName || ticker,
@@ -41,6 +66,7 @@ export async function POST(request: Request) {
             changePct,
           };
         } catch (err) {
+          console.error(`[stock-prices] Exception fetching ${ticker}:`, err);
           return { ticker, price: null, change: null, changePct: null };
         }
       })
